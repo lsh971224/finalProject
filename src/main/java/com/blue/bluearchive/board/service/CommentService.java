@@ -1,10 +1,7 @@
 package com.blue.bluearchive.board.service;
 
 import com.blue.bluearchive.admin.entity.Category;
-import com.blue.bluearchive.board.dto.BoardFormDto;
-import com.blue.bluearchive.board.dto.CommentDto;
-import com.blue.bluearchive.board.dto.CommentFormDto;
-import com.blue.bluearchive.board.dto.CommentsCommentDto;
+import com.blue.bluearchive.board.dto.*;
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.entity.Comment;
 import com.blue.bluearchive.board.entity.CommentsComment;
@@ -178,5 +175,28 @@ public class CommentService {
         }
 
         return commentDtos;
+    }
+
+    public List<CommentDto> searchComments(String option, String keyword) {
+            List<Comment> commentEntities;
+            List<CommentDto> commentDtos = new ArrayList<>();
+
+            switch (option) {
+                case "1": // 작성자
+                    commentEntities = commentRepository.findByCreatedByContaining(keyword);
+                    break;
+                case "2": // 내용
+                    commentEntities = commentRepository.findByCommentContentContaining(keyword);
+                    break;
+                default:
+                    commentEntities = Collections.emptyList();
+                    break;
+            }
+
+            for (Comment comment : commentEntities) {
+                commentDtos.add(modelMapper.map(comment, CommentDto.class));
+            }
+
+            return commentDtos;
     }
 }

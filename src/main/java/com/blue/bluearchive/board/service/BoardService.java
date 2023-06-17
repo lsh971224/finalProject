@@ -5,6 +5,7 @@ import com.blue.bluearchive.admin.repository.CategoryRepository;
 import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.dto.BoardFormDto;
 import com.blue.bluearchive.board.dto.BoardImgDto;
+import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.entity.BoardImg;
 import com.blue.bluearchive.board.entity.Comment;

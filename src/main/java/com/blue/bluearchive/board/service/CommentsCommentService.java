@@ -1,5 +1,6 @@
 package com.blue.bluearchive.board.service;
 
+import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentFormDto;
 import com.blue.bluearchive.board.entity.Board;
@@ -192,5 +193,28 @@ public class CommentsCommentService {
 
         // Delete the likes/hates
         commentsCommentLikeHateRepository.deleteAll(likeHateList);
+    }
+
+    public List<CommentsCommentDto> searchCommentsComment(String option, String keyword) {
+        List<CommentsComment> commentsComments;
+        List<CommentsCommentDto> commentsCommentList = new ArrayList<>();
+
+        switch (option) {
+            case "1": // 작성자
+                commentsComments = commentsCommentRepository.findByCreatedByContaining(keyword);
+                break;
+            case "2": // 내용
+                commentsComments = commentsCommentRepository.findByCommentsCommentContentContaining(keyword);
+                break;
+            default:
+                commentsComments = Collections.emptyList();
+                break;
+        }
+
+        for (CommentsComment commentsComment : commentsComments) {
+            commentsCommentList.add(modelMapper.map(commentsComment, CommentsCommentDto.class));
+        }
+
+        return commentsCommentList;
     }
 }

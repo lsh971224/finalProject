@@ -61,6 +61,12 @@
                 }
             }
         });
+        function searchBoard(){
+            const  search= $('#searchOption').val();
+            const keyword = $('#searchKeyword').val();
+            const url = '/admin/commentMgt2?search='+search+'&keyword='+keyword;
+            window.location.href = url;
+        }
     </script>
         <div class="row">
             <div class="col-md-4 text-center h3">
@@ -86,18 +92,17 @@
                                 </select>
                             </div>
                             <div class="col-md-2  text-center">
-                                <select class="form-select form-select-sm" aria-label=".form-select-sm example">
-                                    <option value="1" selected>제목</option>
-                                    <option value="2">작성자</option>
-                                    <option value="3">댓글내용</option>
+                                <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="searchOption" >
+                                    <option value="1">작성자</option>
+                                    <option value="2">댓글내용</option>
                                 </select>
                             </div>
 
                             <div class="col-md-5  text-center">
-                                <input type="text" class="form-control" placeholder="Username"/>
+                                <input type="text" class="form-control" placeholder="작성해주세용" id="searchKeyword"  onkeydown="if (event.keyCode === 13) searchBoard();"/>
                             </div>
                             <div class="col-md-1  text-center">
-                                <button class="btn btn-outline-secondary">검색</button>
+                                <button class="btn btn-outline-secondary" onclick="searchBoard()">검색</button>
                             </div>
                         </div>
 

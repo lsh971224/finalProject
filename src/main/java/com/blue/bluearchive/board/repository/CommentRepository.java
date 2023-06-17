@@ -2,6 +2,7 @@ package com.blue.bluearchive.board.repository;
 
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.entity.Comment;
+import com.blue.bluearchive.board.entity.CommentsComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,6 +12,10 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     int countByBoard(Board boardId);
 
+
+    List<Comment> findByCreatedByContaining(String keyword);
+
+    List<Comment> findByCommentContentContaining(String keyword);
 
 
 }

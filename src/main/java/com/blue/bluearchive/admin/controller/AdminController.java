@@ -7,6 +7,7 @@ import com.blue.bluearchive.admin.service.CategoryService;
 import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentDto;
+import com.blue.bluearchive.board.entity.Comment;
 import com.blue.bluearchive.board.service.BoardService;
 import com.blue.bluearchive.board.service.CommentService;
 import com.blue.bluearchive.board.service.CommentsCommentService;
@@ -96,6 +97,19 @@ public class AdminController {
         model.addAttribute("id", id);
         return "adminPage/manageCommunity_comment";  // Return as JSON
     }
+    @GetMapping("/commentMgt2")
+    public String commentMgt2(Model model, @RequestParam(value = "search") String search,
+                           @RequestParam(value = "keyword")String keyword) {
+        List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
+
+        List<CommentDto> commentDtos = commentService.searchComments(search,keyword);
+        if (commentDtos.isEmpty()) {
+            model.addAttribute("message", "해당 게시글이 존재하지 않습니다.");
+        }
+        model.addAttribute("categoryList", categoryDtoList);
+        model.addAttribute("commentDtos", commentDtos);
+        return "/adminPage/manageCommunity_comment"; // boardMgt.html 페이지를 렌더링하여 반환
+    }
     @GetMapping("/commentsCommentMgt")
     public String getCommentsCommentMgt(Model model) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
@@ -113,7 +127,19 @@ public class AdminController {
         model.addAttribute("id", id);
         return "adminPage/manageCommunity_commentsComment";  // Update the view template name
     }
+    @GetMapping("/commentsComment2")
+    public String commentsComment2(Model model, @RequestParam(value = "search") String search,
+                              @RequestParam(value = "keyword")String keyword) {
+        List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
 
+        List<CommentsCommentDto> commentsCommentDtos = commentsCommentService.searchCommentsComment(search,keyword);
+        if (commentsCommentDtos.isEmpty()) {
+            model.addAttribute("message", "해당 게시글이 존재하지 않습니다.");
+        }
+        model.addAttribute("categoryList", categoryDtoList);
+        model.addAttribute("commentsCommentDtos", commentsCommentDtos);
+        return "/adminPage/manageCommunity_commentsComment"; // boardMgt.html 페이지를 렌더링하여 반환
+    }
 
 
     @GetMapping("/newcategory")

@@ -17,4 +17,7 @@ public interface CommentsCommentRepository extends JpaRepository<CommentsComment
 
     //승훈 코드 추가
     List<CommentsComment> findByComment_Board(Board boardId);
+
+    List<CommentsComment> findByCreatedByContaining(String keyword);
+    List<CommentsComment> findByCommentsCommentContentContaining(String keyword);
 }
