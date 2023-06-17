@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+</head>
+<body>
+<table>
+  <tr>
+    <td>
+      <div>
+        <a th:href="'/board/'+${board.category.getCategoryId()}">목록</a>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div>
+
+        <div style="text-align: left">
+          <td th:text="${board.boardCreatedBy}"></td>
+        </div>
+        <div>
+          <script th:inline="javascript">
+            var boardTime = /*[[${board.regTime}]]*/ '';
+            var date = new Date(boardTime);
+            var today = new Date();
+            var year = date.getFullYear();
+            var month = ('0' + (date.getMonth() + 1)).slice(-2);
+            var day = ('0' + date.getDate()).slice(-2);
+            var hours = ('0' + (date.getHours())).slice(-2);
+            var minutes = ('0' + date.getMinutes()).slice(-2);
+            var second =('0'+date.getSeconds()).slice(-2);
+            document.write(year+'-'+month + '-' + day + ' '+hours + ':' + minutes + ':'+second);
+
+          </script>
+        </div>
+        <div style="text-align: right">
+          <td th:text="${board.boardCount}"></td>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div style="text-align: center">
+        <td th:text="${board.boardTitle}"></td>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div th:text="${board.boardContent}"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+
+      <button onclick="likeBoard(${board.boardId})">
+        좋아요<span id="likeCount-${board.boardId}"th:text="${board.boardLikeCount}"></span>
+      </button>
+
+
+      <button>
+        싫어요
+        <span th:text="${board.boardHateCount}"></span>
+      </button>
+      <button>
+        신고
+        <span th:text="${board.boardReportsCount}"></span>
+      </button>
+    </td>
+  </tr>
+
+  </tbody>
+</table>
+
+
+    <div style="list-style-type: none" th:each="comment:${commentList}">
+      <div>
+        <div style="display: flex; align-items: center">
+          <span th:text="${comment.createdBy}"></span>
+          <span>
+           <script th:inline="javascript">
+          var boardTime = /*[[${comment.regTime}]]*/ '';
+          var date = new Date(boardTime);
+          var clientOffset = new Date().getTimezoneOffset(); // 클라이언트의 시간대 오프셋 (분 단위)
+          var timeOffset = clientOffset * 60 * 1000; // 시간대 오프셋 차이 (밀리초 단위)
+          date.setTime(date.getTime() + timeOffset); // 서버 시간에 오프셋을 더합니다.
+          var today = new Date();
+          var year = date.getFullYear();
+          var month = ('0' + (date.getMonth() + 1)).slice(-2);
+          var day = ('0' + date.getDate()).slice(-2);
+          var hours = ('0' + (date.getHours())).slice(-2);
+          var minutes = ('0' + date.getMinutes()).slice(-2);
+          var second =('0'+date.getSeconds()).slice(-2);
+          document.write('('+year+'-'+month + '-' + day + ' '+hours + ':' + minutes + ':'+second+')');
+
+        </script>
+        </span>
+          <button>
+            좋아요
+            <span th:text="${comment.commentLikeCount}"></span>
+          </button>
+          <button>
+            싫어요
+            <span th:text="${comment.commentHateCount}"></span>
+          </button>
+          <button>
+            신고
+            <span th:text="${comment.commentReportsCount}"></span>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center" >
+          <span th:text="${comment.commentContent}"></span>
+
+          <a href="#">답글</a>
+
+        </div>
+        <div style="list-style-type: none; margin-left: 20px"  th:each="commentsComment : ${commentsCommentMap.get(comment.commentId)}">
+          <div style="display: flex; align-items: center">
+            <span th:text="${commentsComment.createdBy}"></span>
+            <script th:inline="javascript">
+              var boardTime = /*[[${commentsComment.regTime}]]*/ '';
+              var date = new Date(boardTime);
+              var clientOffset = new Date().getTimezoneOffset(); // 클라이언트의 시간대 오프셋 (분 단위)
+              var timeOffset = clientOffset * 60 * 1000; // 시간대 오프셋 차이 (밀리초 단위)
+              date.setTime(date.getTime() + timeOffset); // 서버 시간에 오프셋을 더합니다.
+              var today = new Date();
+              var year = date.getFullYear();
+              var month = ('0' + (date.getMonth() + 1)).slice(-2);
+              var day = ('0' + date.getDate()).slice(-2);
+              var hours = ('0' + (date.getHours())).slice(-2);
+              var minutes = ('0' + date.getMinutes()).slice(-2);
+              var second =('0'+date.getSeconds()).slice(-2);
+              document.write('('+year+'-'+month + '-' + day + ' '+hours + ':' + minutes + ':'+second+')');
+
+            </script>
+            </span>
+            <button>
+              좋아요
+              <span th:text="${commentsComment.commentsCommentLikeCount}"></span>
+            </button>
+            <button>
+              싫어요
+              <span th:text="${commentsComment.commentsCommentHateCount}"></span>
+            </button>
+            <button>
+              신고
+              <span th:text="${commentsComment.commentsCommentReportsCount}"></span>
+            </button>
+          </div>
+          <div>
+            <span th:text="${commentsComment.commentsCommentContent}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+<div>
+  <form>
+    <table>
+      <tr>
+        <td>
+          <textarea style="width: 900px; height: 70px; resize: none;" placeholder="명예회손, 개인정보 유츌, 분쟁 유발, 허위사실 유포등의 글의 이용약관에 의해 제재는 물론 법률에 의해 처벌 받을 수 있습니다. 건전한 커뮤니티를 위해 자제를 당부 드립니다."></textarea>
+        </td>
+        <td>
+          <button type="button" style="width: 100px;height: 70px">등록</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+</body>
+</html>

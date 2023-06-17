@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layouts/layout1}">
+
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+
+    </style>
+</th:block>
+
+
+<div layout:fragment="content">
+    메인 content 양식
+    <div sec:authorize="isAuthenticated()">
+        <h2>User Details:</h2>
+        <p>id: <span th:text="${#authentication.principal.id}"></span></p>
+        <p>name: <span th:text="${#authentication.principal.username}"></span></p>
+        <p>Nickname: <span th:text="${#authentication.principal.nickName}"></span></p>
+        <p>Address: <span th:text="${#authentication.principal.address}"></span></p>
+        <p>Phone number: <span th:text="${#authentication.principal.phoneNum}"></span></p>
+        <p>작성자: <span th:text="${#authentication.principal.createdBy}"></span></p>
+    </div>
+
+
+
+</div>
+</html>
