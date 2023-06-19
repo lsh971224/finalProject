@@ -15,6 +15,5 @@ public class CommentDto {
     private Integer commentReportsCount = 0;
     private String createdBy;
     private LocalDateTime regTime;
-    // 승훈 코드 추가
-    private boolean isDeleted;
+
 }

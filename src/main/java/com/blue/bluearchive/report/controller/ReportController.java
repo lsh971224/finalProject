@@ -34,12 +34,10 @@ public class ReportController {
     @PostMapping(value = "/report/board/new")
     public String reportBoardNew(@Valid ReportBoardFormDto reportBoardFormDto, BindingResult bindingResult, Model model) {
         if(bindingResult.hasErrors()){
-            System.out.println("================================신고 유효성 추가 예정==============================");
             model.addAttribute("errorMessage","신고 유효성 오류");
             return "/report/reportFalse";
         }
         try {
-            System.out.println(reportBoardFormDto);
             reportService.saveReportBoard(reportBoardFormDto);
         }catch (Exception e){
             e.printStackTrace();
@@ -59,14 +57,11 @@ public class ReportController {
 
     @PostMapping(value = "/report/comment/new")
     public String reportCommentNew(@Valid ReportCommentFormDto reportCommentFormDto, BindingResult bindingResult, Model model) {
-        System.out.println("===========댓글 신고 컨트롤러 진입================");
         if(bindingResult.hasErrors()){
-            System.out.println("================================신고 유효성 추가 예정==============================");
             model.addAttribute("errorMessage","신고 유효성 오류");
             return "/report/reportFalse";
         }
         try {
-            System.out.println(reportCommentFormDto);
             reportService.saveReportComment(reportCommentFormDto);
         }catch (Exception e){
             e.printStackTrace();
@@ -87,14 +82,11 @@ public class ReportController {
 
     @PostMapping(value = "/report/commentsComment/new")
     public String reportCommentsCommentNew(@Valid ReportCommentsCommentFormDto reportCommentsCommentFormDto, BindingResult bindingResult, Model model) {
-        System.out.println("===========대댓글 신고 컨트롤러 진입================");
         if(bindingResult.hasErrors()){
-            System.out.println("================================신고 유효성 추가 예정==============================");
             model.addAttribute("errorMessage","신고 유효성 오류");
             return "/report/reportFalse";
         }
         try {
-            System.out.println(reportCommentsCommentFormDto);
             reportService.saveReportCommentsComment(reportCommentsCommentFormDto);
         }catch (Exception e){
             e.printStackTrace();

@@ -7,6 +7,7 @@ import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.repository.BoardRepository;
 import com.blue.bluearchive.board.service.BoardService;
+import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class CategoryService {
     private final ModelMapper modelMapper;
     private final BoardService boardService;
     private final BoardRepository boardRepository;
+    private final ReportBoardRepository reportBoardRepository;
 
 
     //승훈이꺼 추가
@@ -79,12 +81,12 @@ public class CategoryService {
     }
 
     public List<CategoryDto> getAllCategory() {
-        List<Category> CategoryEntities = categoryRepository.findAll();
-        List<CategoryDto> CategoryDtos = new ArrayList<>();
-        for (Category category : CategoryEntities) {
-            CategoryDtos.add(modelMapper.map(category, CategoryDto.class));
+        List<Category> categoryEntities = categoryRepository.findAll();
+        List<CategoryDto> categoryDtos = new ArrayList<>();
+        for (Category category : categoryEntities) {
+            categoryDtos.add(modelMapper.map(category, CategoryDto.class));
         }
-        return CategoryDtos;
+        return categoryDtos;
     }
 
     public List<CategoryDto> getTotal() {

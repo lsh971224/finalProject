@@ -1,5 +1,6 @@
 package com.blue.bluearchive.board.service;
 
+import com.blue.bluearchive.admin.dto.AdminCommentDto;
 import com.blue.bluearchive.admin.entity.Category;
 import com.blue.bluearchive.board.dto.*;
 import com.blue.bluearchive.board.entity.Board;
@@ -9,6 +10,7 @@ import com.blue.bluearchive.board.repository.BoardRepository;
 import com.blue.bluearchive.board.repository.CommentRepository;
 import com.blue.bluearchive.board.repository.CommentsCommentRepository;
 import com.blue.bluearchive.member.dto.CustomUserDetails;
+import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
@@ -32,7 +34,7 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final CommentsCommentRepository commentsCommentRepository;
 
-
+    private final ReportBoardRepository reportBoardRepository;
     @Transactional(readOnly = true)
     public List<CommentDto> getCommentByBoardId(int boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow();
@@ -147,8 +149,8 @@ public class CommentService {
         }
         return commentDtos;
     }
-    public List<CommentDto> getCommentsByCategoryId(int categoryId) {
-        List<CommentDto> commentDtos = new ArrayList<>();
+    public List<AdminCommentDto> getCommentsByCategoryId(int categoryId) {
+        List<AdminCommentDto> commentDtos = new ArrayList<>();
 
         if(categoryId == 0){
             List<Board> boards = boardRepository.findAll();
@@ -156,10 +158,10 @@ public class CommentService {
             for (Board board : boards) {
                 List<Comment> comments = commentRepository.findByBoard(board);
                 for (Comment comment : comments) {
-                    String s = comment.getBoard().getCategory().getCategoryName();
-                    System.out.println("게시물 카테고리 이름 : "+s);
-                    CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+                    AdminCommentDto commentDto = modelMapper.map(comment, AdminCommentDto.class);
+                    int size = reportBoardRepository.findByCommentCommentIdAndReportStatusFalse(comment.getCommentId()).size();
                     commentDtos.add(commentDto);
+                    commentDtos.get(commentDtos.size()-1).setNotReportCount(size);
                 }
             }
         }else{
@@ -168,8 +170,10 @@ public class CommentService {
             for (Board board : boards) {
                 List<Comment> comments = commentRepository.findByBoard(board);
                 for (Comment comment : comments) {
-                    CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+                    AdminCommentDto commentDto = modelMapper.map(comment, AdminCommentDto.class);
                     commentDtos.add(commentDto);
+                    int size = reportBoardRepository.findByCommentCommentIdAndReportStatusFalse(comment.getCommentId()).size();
+                    commentDtos.get(commentDtos.size()-1).setNotReportCount(size);
                 }
             }
         }
@@ -177,9 +181,9 @@ public class CommentService {
         return commentDtos;
     }
 
-    public List<CommentDto> searchComments(String option, String keyword) {
+    public List<AdminCommentDto> searchComments(String option, String keyword) {
             List<Comment> commentEntities;
-            List<CommentDto> commentDtos = new ArrayList<>();
+            List<AdminCommentDto> commentDtos = new ArrayList<>();
 
             switch (option) {
                 case "1": // 작성자
@@ -194,7 +198,9 @@ public class CommentService {
             }
 
             for (Comment comment : commentEntities) {
-                commentDtos.add(modelMapper.map(comment, CommentDto.class));
+                commentDtos.add(modelMapper.map(comment, AdminCommentDto.class));
+                int size = reportBoardRepository.findByCommentCommentIdAndReportStatusFalse(comment.getCommentId()).size();
+                commentDtos.get(commentDtos.size()-1).setNotReportCount(size);
             }
 
             return commentDtos;

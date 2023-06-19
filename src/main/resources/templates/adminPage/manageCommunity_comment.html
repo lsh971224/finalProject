@@ -218,11 +218,11 @@
                                 <span th:text="${comment.commentHateCount}"></span>
                             </div>
                             <div class="col-1 d-flex align-self-center justify-content-center">
-                                <button class="btn btn-link openReportList" th:value="${comment.commentId}" th:if="${comment.commentReportsCount > 0}">
-                                    (<span th:text="${comment.commentReportsCount}"></span>)
+                                <button class="btn btn-link openReportList" th:value="${comment.commentId}" th:if="${comment.notReportCount > 0}">
+                                    (<span th:text="${comment.notReportCount}"></span>)
                                 </button>
-                                <button class="btn btn-link openReportList" th:value="${comment.commentId}" th:unless="${comment.commentReportsCount > 0}" disabled>
-                                    (<span th:text="${comment.commentReportsCount}"></span>)
+                                <button class="btn btn-link openReportList" th:value="${comment.commentId}" th:unless="${comment.notReportCount > 0}" disabled>
+                                    (<span th:text="${comment.notReportCount}"></span>)
                                 </button>
                             </div>
                             <div class="col-1 d-flex align-items-center justify-content-center">

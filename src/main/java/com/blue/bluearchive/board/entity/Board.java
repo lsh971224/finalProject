@@ -3,11 +3,13 @@ package com.blue.bluearchive.board.entity;
 import com.blue.bluearchive.admin.entity.Category;
 import com.blue.bluearchive.board.dto.BoardFormDto;
 import com.blue.bluearchive.member.entity.Member;
+import com.blue.bluearchive.report.entity.Report;
 import com.blue.bluearchive.shop.entity.BaseEntity;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -52,10 +54,15 @@ public class Board extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+
     public void updateBoard(BoardFormDto boardFormDto){
         this.boardTitle=boardFormDto.getBoardTitle();
         this.boardContent=boardFormDto.getBoardContent();
         this.category=boardFormDto.getCategory();
     }
+
+    //승훈 추가
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    List<Report> reportList = new ArrayList<>();
 
 }

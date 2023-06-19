@@ -1,5 +1,6 @@
 package com.blue.bluearchive.board.service;
 
+import com.blue.bluearchive.admin.dto.AdminCommentsCommentDto;
 import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentFormDto;
@@ -12,6 +13,7 @@ import com.blue.bluearchive.board.repository.CommentRepository;
 import com.blue.bluearchive.board.repository.CommentsCommentLikeHateRepository;
 import com.blue.bluearchive.board.repository.CommentsCommentRepository;
 import com.blue.bluearchive.member.dto.CustomUserDetails;
+import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
@@ -33,7 +35,7 @@ public class CommentsCommentService {
     private final CommentsCommentRepository commentsCommentRepository;
     private final ModelMapper modelMapper;
     private final CommentsCommentLikeHateRepository commentsCommentLikeHateRepository;
-
+    private final ReportBoardRepository reportBoardRepository;
 
     public List<CommentsCommentDto> getCommentsCommentByCommentId(int commentId){
         Comment comment = commentRepository.findById(commentId).orElseThrow();
@@ -130,8 +132,8 @@ public class CommentsCommentService {
 
     //승훈 코드 추가
     private final BoardRepository boardRepository;
-    public List<CommentsCommentDto> getCommentsCommentByCategoryId(int categoryId) {
-        List<CommentsCommentDto> commentsCommentDtos = new ArrayList<>();
+    public List<AdminCommentsCommentDto> getCommentsCommentByCategoryId(int categoryId) {
+        List<AdminCommentsCommentDto> commentsCommentDtos = new ArrayList<>();
 
         if(categoryId == 0){
             List<Board> boards = boardRepository.findAll();
@@ -139,8 +141,10 @@ public class CommentsCommentService {
             for (Board board : boards) {
                 List<CommentsComment> commentsComments = commentsCommentRepository.findByComment_Board(board);
                 for (CommentsComment commentsComment : commentsComments) {
-                    CommentsCommentDto commentsCommentDtoDto = modelMapper.map(commentsComment, CommentsCommentDto.class);
+                    AdminCommentsCommentDto commentsCommentDtoDto = modelMapper.map(commentsComment, AdminCommentsCommentDto.class);
                     commentsCommentDtos.add(commentsCommentDtoDto);
+                    int size = reportBoardRepository.findByCommentsCommentCommentsCommentIdAndReportStatusFalse(commentsComment.getCommentsCommentId()).size();
+                    commentsCommentDtos.get(commentsCommentDtos.size()-1).setNotReportCount(size);
                 }
             }
         }else{
@@ -149,8 +153,10 @@ public class CommentsCommentService {
             for (Board board : boards) {
                 List<CommentsComment> comments = commentsCommentRepository.findByComment_Board(board);
                 for (CommentsComment commentsComment : comments) {
-                    CommentsCommentDto commentsCommentDto = modelMapper.map(commentsComment, CommentsCommentDto.class);
+                    AdminCommentsCommentDto commentsCommentDto = modelMapper.map(commentsComment, AdminCommentsCommentDto.class);
                     commentsCommentDtos.add(commentsCommentDto);
+                    int size = reportBoardRepository.findByCommentsCommentCommentsCommentIdAndReportStatusFalse(commentsComment.getCommentsCommentId()).size();
+                    commentsCommentDtos.get(commentsCommentDtos.size()-1).setNotReportCount(size);
                 }
             }
         }
@@ -158,14 +164,16 @@ public class CommentsCommentService {
         return commentsCommentDtos;
     }
 
-    public List<CommentsCommentDto> getCommentsComment() {
-        List<CommentsCommentDto> commentsCommentDtos = new ArrayList<>();
+    public List<AdminCommentsCommentDto> getCommentsComment() {
+        List<AdminCommentsCommentDto> commentsCommentDtos = new ArrayList<>();
         List<Board> boards = boardRepository.findAll();
         for (Board board : boards) {
             List<CommentsComment> commentsComments = commentsCommentRepository.findByComment_Board(board);
             for (CommentsComment commentsComment : commentsComments) {
-                CommentsCommentDto commentsCommentDto = modelMapper.map(commentsComment, CommentsCommentDto.class);
+                AdminCommentsCommentDto commentsCommentDto = modelMapper.map(commentsComment, AdminCommentsCommentDto.class);
                 commentsCommentDtos.add(commentsCommentDto);
+                int size = reportBoardRepository.findByCommentsCommentCommentsCommentIdAndReportStatusFalse(commentsComment.getCommentsCommentId()).size();
+                commentsCommentDtos.get(commentsCommentDtos.size()-1).setNotReportCount(size);
             }
         }
         return commentsCommentDtos;
@@ -195,9 +203,9 @@ public class CommentsCommentService {
         commentsCommentLikeHateRepository.deleteAll(likeHateList);
     }
 
-    public List<CommentsCommentDto> searchCommentsComment(String option, String keyword) {
+    public List<AdminCommentsCommentDto> searchCommentsComment(String option, String keyword) {
         List<CommentsComment> commentsComments;
-        List<CommentsCommentDto> commentsCommentList = new ArrayList<>();
+        List<AdminCommentsCommentDto> commentsCommentList = new ArrayList<>();
 
         switch (option) {
             case "1": // 작성자
@@ -212,7 +220,9 @@ public class CommentsCommentService {
         }
 
         for (CommentsComment commentsComment : commentsComments) {
-            commentsCommentList.add(modelMapper.map(commentsComment, CommentsCommentDto.class));
+            commentsCommentList.add(modelMapper.map(commentsComment, AdminCommentsCommentDto.class));
+            int size = reportBoardRepository.findByCommentsCommentCommentsCommentIdAndReportStatusFalse(commentsComment.getCommentsCommentId()).size();
+            commentsCommentList.get(commentsCommentList.size()-1).setNotReportCount(size);
         }
 
         return commentsCommentList;

@@ -2,9 +2,12 @@ package com.blue.bluearchive.board.dto;
 
 import com.blue.bluearchive.admin.entity.Category;
 import com.blue.bluearchive.member.entity.Member;
+import com.blue.bluearchive.report.entity.Report;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class BoardDto {
@@ -21,5 +24,4 @@ public class BoardDto {
     private Integer commentCount;
     private Member member;
     private Category category;
-
 }

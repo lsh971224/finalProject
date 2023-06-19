@@ -2,6 +2,7 @@ package com.blue.bluearchive.report.service;
 
 
 import com.blue.bluearchive.admin.dto.ReportDto;
+import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.entity.Comment;
 import com.blue.bluearchive.board.entity.CommentsComment;
@@ -19,6 +20,10 @@ import com.blue.bluearchive.report.entity.Report;
 import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +46,11 @@ public class ReportService {
     //건희 추가
     @Transactional(readOnly = false)
     public Integer saveReportBoard(ReportBoardFormDto reportBoardFormDto){
-        System.out.println("==========서비스 진입===============");
         Report reportBoard = reportBoardFormDto.createReport();
 //        reportBoard.setBoardId(reportBoardFormDto.getBoardId());
 //        reportBoard.setTargetCreatedBy(reportBoardFormDto.getTargetCreatedBy());
 //        reportBoard.setReportContent(reportBoardFormDto.getReportBoardContent());
 //        reportBoard.setReportCategory(reportBoardFormDto.getReportBoardCategory());
-        System.out.println(reportBoard);
         reportBoardRepository.save(reportBoard);
 
         Board board = reportBoardFormDto.getBoard();
@@ -61,7 +65,6 @@ public class ReportService {
         reportBoard.put("boardTitle",board.getBoardTitle());
         reportBoard.put("board",Integer.toString(board.getBoardId()));
         reportBoard.put("targetCreatedBy",board.getCreatedBy());
-        System.out.println("===============================================확인용=============="+board.getCreatedBy());
 
         Member member = memberRepository.findById(Long.valueOf(board.getCreatedBy())).orElseThrow();
         reportBoard.put("boardNickName",member.getNickName());
@@ -79,9 +82,7 @@ public class ReportService {
 
     @Transactional(readOnly = false)
     public Integer saveReportComment(ReportCommentFormDto reportCommentFormDto){
-        System.out.println("==========서비스 진입===============");
         Report reportComment = reportCommentFormDto.createReport();
-        System.out.println(reportComment);
         reportBoardRepository.save(reportComment);
 
         Comment comment = reportCommentFormDto.getComment();
@@ -135,9 +136,7 @@ public class ReportService {
 
     @Transactional(readOnly = false)
     public Integer saveReportCommentsComment(ReportCommentsCommentFormDto reportCommentsCommentFormDto){
-        System.out.println("==========대댓글 작성 서비스 진입===============");
         Report reportComment = reportCommentsCommentFormDto.createReport();
-        System.out.println(reportComment);
         reportBoardRepository.save(reportComment);
 
         CommentsComment commentsComment = reportCommentsCommentFormDto.getCommentsComment();
@@ -159,6 +158,9 @@ public class ReportService {
         }
         return reportDtos;
     }
+    //페이징 처리
+
+
     public List<ReportDto> getReportsForComment(int commentId) {
         Optional<Comment> commentReport = commentRepository.findById(commentId);
         List<Report> reportEntities = reportBoardRepository.findByComment(commentReport.get());
@@ -189,8 +191,6 @@ public class ReportService {
 
         reportBoardRepository.saveAll(reports);
     }
-
-
 
     // 신고 미처리 수
 

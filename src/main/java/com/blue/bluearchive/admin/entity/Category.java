@@ -24,7 +24,6 @@ public class Category {
     private int totalViews = 0;
     @Column(name = "category_totalReports")
     private int totalReports = 0;
-
     public static Category toCategoryEntity(CategoryDto categoryDto) {
         Category category = new Category();
         category.setCategoryId(categoryDto.getCategoryId());

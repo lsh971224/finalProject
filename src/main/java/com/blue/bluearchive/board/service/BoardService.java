@@ -1,5 +1,6 @@
 package com.blue.bluearchive.board.service;
 
+import com.blue.bluearchive.admin.dto.AdminBoardDto;
 import com.blue.bluearchive.admin.entity.Category;
 import com.blue.bluearchive.admin.repository.CategoryRepository;
 import com.blue.bluearchive.board.dto.BoardDto;
@@ -14,6 +15,8 @@ import com.blue.bluearchive.board.repository.BoardRepository;
 import com.blue.bluearchive.board.repository.CommentRepository;
 import com.blue.bluearchive.board.repository.CommentsCommentRepository;
 import com.blue.bluearchive.board.repository.formRepository.BoardImgRepository;
+import com.blue.bluearchive.report.entity.Report;
+import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import com.blue.bluearchive.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -38,6 +41,7 @@ public class BoardService {
     private final ModelMapper modelMapper;
 
     private final ReportService reportService;
+    private final ReportBoardRepository reportBoardRepository;
 
     private final CommentRepository commentRepository;
     private final CommentsCommentRepository commentsCommentRepository;
@@ -222,9 +226,9 @@ public class BoardService {
         // 게시물 삭제
         boardRepository.deleteById(boardId);
     }
-    public List<BoardDto> searchBoards(String option, String keyword) {
+    public List<AdminBoardDto> searchBoards(String option, String keyword) {
         List<Board> boardEntities;
-        List<BoardDto> boardDtos = new ArrayList<>();
+        List<AdminBoardDto> boardDtos = new ArrayList<>();
 
         switch (option) {
             case "1": // 제목
@@ -233,16 +237,15 @@ public class BoardService {
             case "2": // 작성자
                 boardEntities = boardRepository.findByCreatedByContaining(keyword);
                 break;
-            case "3": // 내용
-                boardEntities = boardRepository.findByBoardContentContaining(keyword);
-                break;
             default:
                 boardEntities = Collections.emptyList();
                 break;
         }
 
         for (Board board : boardEntities) {
-            boardDtos.add(modelMapper.map(board, BoardDto.class));
+            boardDtos.add(modelMapper.map(board, AdminBoardDto.class));
+            int size = reportBoardRepository.findByBoardBoardIdAndReportStatusFalse(board.getBoardId()).size();
+            boardDtos.get(boardDtos.size()-1).setNotReportCount(size);
         }
 
         return boardDtos;

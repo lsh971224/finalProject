@@ -1,13 +1,11 @@
 package com.blue.bluearchive.admin.controller;
 
-import com.blue.bluearchive.admin.dto.CategoryDto;
-import com.blue.bluearchive.admin.dto.ReportDto;
+import com.blue.bluearchive.admin.dto.*;
 import com.blue.bluearchive.admin.entity.Category;
+import com.blue.bluearchive.admin.service.AdminBoardService;
 import com.blue.bluearchive.admin.service.CategoryService;
-import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentDto;
-import com.blue.bluearchive.board.entity.Comment;
 import com.blue.bluearchive.board.service.BoardService;
 import com.blue.bluearchive.board.service.CommentService;
 import com.blue.bluearchive.board.service.CommentsCommentService;
@@ -22,10 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,6 +32,7 @@ public class AdminController {
     private final CommentService commentService;
     private final CommentsCommentService commentsCommentService;
     private final ReportService reportService;
+    private final AdminBoardService adminBoardService;
 
     @GetMapping("/main")
     public String adminMain() {
@@ -61,25 +57,24 @@ public class AdminController {
     @GetMapping("/boardMgt")
     public String boardMgt(Model model, @RequestParam(value = "categoryId", defaultValue = "0") int categoryId) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
-        List<BoardDto> boardDtoList;
+        List<AdminBoardDto> boardDtoList;
         if (categoryId == 0) {
-            // Fetch all boards
-            boardDtoList = boardService.getAllBoards();
+            boardDtoList = adminBoardService.getAllBoards(); // 카테고리 상간없이 전체 게시글 가져옴
         } else {
-            // Fetch boards by category ID
-            boardDtoList = boardService.getBoardsByCategoryId(categoryId);
+            boardDtoList = adminBoardService.getBoardsByCategoryId(categoryId);  //카테고리에 해당하는 게시글을 가져온다
         }
         model.addAttribute("selectId", categoryId);
         model.addAttribute("categoryList", categoryDtoList);
         model.addAttribute("boardDtoList", boardDtoList);
         return "/adminPage/manageCommunity_board"; // boardMgt.html 페이지를 렌더링하여 반환
     }
+
     @GetMapping("/boardMgt2")
     public String boardMgt(Model model, @RequestParam(value = "search") String search,
                            @RequestParam(value = "keyword")String keyword) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
 
-        List<BoardDto> boardDtoList = boardService.searchBoards(search,keyword);
+        List<AdminBoardDto> boardDtoList = boardService.searchBoards(search,keyword);
         if (boardDtoList.isEmpty()) {
             model.addAttribute("message", "해당 게시글이 존재하지 않습니다.");
         }
@@ -92,7 +87,7 @@ public class AdminController {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
         model.addAttribute("categoryList", categoryDtoList);
 
-        List<CommentDto> commentDtos = commentService.getCommentsByCategoryId(id);
+        List<AdminCommentDto> commentDtos = commentService.getCommentsByCategoryId(id);
         model.addAttribute("commentDtos", commentDtos);
         model.addAttribute("id", id);
         return "adminPage/manageCommunity_comment";  // Return as JSON
@@ -102,7 +97,7 @@ public class AdminController {
                            @RequestParam(value = "keyword")String keyword) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
 
-        List<CommentDto> commentDtos = commentService.searchComments(search,keyword);
+        List<AdminCommentDto> commentDtos = commentService.searchComments(search,keyword);
         if (commentDtos.isEmpty()) {
             model.addAttribute("message", "해당 게시글이 존재하지 않습니다.");
         }
@@ -113,7 +108,7 @@ public class AdminController {
     @GetMapping("/commentsCommentMgt")
     public String getCommentsCommentMgt(Model model) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
-        List<CommentsCommentDto> commentsCommentDtos = commentsCommentService.getCommentsComment();
+        List<AdminCommentsCommentDto> commentsCommentDtos = commentsCommentService.getCommentsComment();
         model.addAttribute("commentsCommentDtos", commentsCommentDtos);
         model.addAttribute("categoryList", categoryDtoList);
         return "adminPage/manageCommunity_commentsComment";  // Update the view template name
@@ -121,7 +116,7 @@ public class AdminController {
     @GetMapping("/commentsCommentMgt/{id}")
     public String getCommentsCommentMgt(@PathVariable int id, Model model) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
-        List<CommentsCommentDto> commentsCommentDtos = commentsCommentService.getCommentsCommentByCategoryId(id);
+        List<AdminCommentsCommentDto> commentsCommentDtos = commentsCommentService.getCommentsCommentByCategoryId(id);
         model.addAttribute("commentsCommentDtos", commentsCommentDtos);
         model.addAttribute("categoryList", categoryDtoList);
         model.addAttribute("id", id);
@@ -132,7 +127,7 @@ public class AdminController {
                               @RequestParam(value = "keyword")String keyword) {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategory();
 
-        List<CommentsCommentDto> commentsCommentDtos = commentsCommentService.searchCommentsComment(search,keyword);
+        List<AdminCommentsCommentDto> commentsCommentDtos = commentsCommentService.searchCommentsComment(search,keyword);
         if (commentsCommentDtos.isEmpty()) {
             model.addAttribute("message", "해당 게시글이 존재하지 않습니다.");
         }
@@ -235,18 +230,19 @@ public class AdminController {
         }
     }
 
-    //게시글 신고 클릭시 팝업
+//    게시글 신고 클릭시 팝업
     @GetMapping("/reportList/{boardId}")
-    public String commentReportResult(@PathVariable int boardId, Model model){
+    public String boardReportResult(@PathVariable int boardId, Model model){
         List<ReportDto> reports = reportService.getReportsForBoard(boardId); //보드에대한 신고
         model.addAttribute("boardId", boardId);
         model.addAttribute("reports", reports);
 
         return "adminPage/boardReportResult";
     }
+
     //댓글 신고 클릭시 팝업
     @GetMapping("/commentReport/{commentId}")
-    public String commentsCommentReportResult(@PathVariable int commentId, Model model){
+    public String commentReportResult(@PathVariable int commentId, Model model){
         List<ReportDto> reports = reportService.getReportsForComment(commentId); //보드에대한 신고
         model.addAttribute("commentId", commentId);
         model.addAttribute("reports", reports);
@@ -255,7 +251,7 @@ public class AdminController {
     }
     //대댓글 신고 클릭시 팝업
     @GetMapping("/commentsComment/{commentsCommentId}")
-    public String boardReportResult(@PathVariable int commentsCommentId, Model model){
+    public String commentsCommentReportResult(@PathVariable int commentsCommentId, Model model){
         List<ReportDto> reports = reportService.getReportsForCommentsComment(commentsCommentId); //보드에대한 신고
         model.addAttribute("commentsCommentId", commentsCommentId);
         model.addAttribute("reports", reports);
