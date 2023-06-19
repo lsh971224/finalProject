@@ -47,7 +47,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="report : ${reports}" th:if="${!report.reportStatus}">
+        <tr th:each="report : ${reportPageDto.reportList}" th:if="${!report.reportStatus}" >
             <td>
                 <input type="checkbox" class="reportCheck" th:value="${report.reportId}"/>
             </td>
@@ -58,6 +58,25 @@
         </tr>
         </tbody>
     </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination  justify-content-center">
+            <li class="page-item" th:classappend="${reportPageDto.currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/commentsComment/{commentsCommentId}(commentsCommentId=${commentsCommentId}, page=1)}">First</a>
+            </li>
+            <li class="page-item" th:classappend="${reportPageDto.currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/commentsComment/{commentsCommentId}(commentsCommentId=${commentsCommentId}, page=${reportPageDto.currentPage - 1})}">Previous</a>
+            </li>
+            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(1, reportPageDto.totalPages)}" th:classappend="${pageNumber == reportPageDto.currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/admin/commentsComment/{commentsCommentId}(commentsCommentId=${commentsCommentId}, page=${pageNumber})}" th:text="${pageNumber}"></a>
+            </li>
+            <li class="page-item" th:classappend="${reportPageDto.currentPage == reportPageDto.totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/commentsComment/{commentsCommentId}(commentsCommentId=${commentsCommentId}, page=${reportPageDto.currentPage + 1})}">Next</a>
+            </li>
+            <li class="page-item" th:classappend="${reportPageDto.currentPage == reportPageDto.totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/commentsComment/{commentsCommentId}(commentsCommentId=${commentsCommentId}, page=${reportPageDto.totalPages})}">Last</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <div class="button-container">
@@ -99,6 +118,7 @@
                     $(".reportCheck:checked").closest("tr").remove();
                     console.log("신고 읽음 처리가 완료되었습니다.");
                     // 추가적인 로직이 있다면 여기에 작성하세요.
+                    location.reload();
                 },
                 error: function (xhr, status, error) {
                     // 에러 처리

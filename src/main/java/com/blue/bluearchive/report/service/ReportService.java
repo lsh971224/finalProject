@@ -2,6 +2,7 @@ package com.blue.bluearchive.report.service;
 
 
 import com.blue.bluearchive.admin.dto.ReportDto;
+import com.blue.bluearchive.admin.dto.ReportPageDto;
 import com.blue.bluearchive.board.dto.BoardDto;
 import com.blue.bluearchive.board.entity.Board;
 import com.blue.bluearchive.board.entity.Comment;
@@ -20,10 +21,7 @@ import com.blue.bluearchive.report.entity.Report;
 import com.blue.bluearchive.report.repository.ReportBoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -149,38 +147,46 @@ public class ReportService {
 
     //승훈 추가
     ModelMapper modelMapper = new ModelMapper();
-    public List<ReportDto> getReportsForBoard(int boardId) {
+    public ReportPageDto getReportsForBoard(int boardId, int page, int pageSize) {
         Optional<Board> board = boardRepository.findById(boardId);
-        List<Report> reportEntities = reportBoardRepository.findByBoard(board.get());
-        List<ReportDto> reportDtos = new ArrayList<>();
-        for(Report report : reportEntities){
-            reportDtos.add(modelMapper.map(report, ReportDto.class));
-        }
-        return reportDtos;
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("regTime").descending());
+        Page<Report> reportPage = reportBoardRepository.findByBoardAndReportStatusOrderByRegTimeDesc(board.get(), false, pageable);
+        List<ReportDto> reportDtoList = reportPage.map(report -> modelMapper.map(report, ReportDto.class)).getContent();
+
+        ReportPageDto reportPageDto = new ReportPageDto();
+        reportPageDto.setReportList(reportDtoList);
+        reportPageDto.setCurrentPage(reportPage.getNumber() + 1);
+        reportPageDto.setTotalPages(reportPage.getTotalPages());
+
+        return reportPageDto;
     }
     //페이징 처리
+public ReportPageDto getReportsForComment(int commentId,int page, int pageSize) {
+    Optional<Comment> commentsComment = commentRepository.findById(commentId);
+    Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("regTime").descending());
+    Page<Report> reportPage = reportBoardRepository.findByCommentAndReportStatusOrderByRegTimeDesc(commentsComment.get(), false, pageable);
+    List<ReportDto> reportDtoList = reportPage.map(report -> modelMapper.map(report, ReportDto.class)).getContent();
 
+    ReportPageDto reportPageDto = new ReportPageDto();
+    reportPageDto.setReportList(reportDtoList);
+    reportPageDto.setCurrentPage(reportPage.getNumber() + 1);
+    reportPageDto.setTotalPages(reportPage.getTotalPages());
 
-    public List<ReportDto> getReportsForComment(int commentId) {
-        Optional<Comment> commentReport = commentRepository.findById(commentId);
-        List<Report> reportEntities = reportBoardRepository.findByComment(commentReport.get());
-        List<ReportDto> reportDtos = new ArrayList<>();
-        for(Report report : reportEntities){
-            reportDtos.add(modelMapper.map(report, ReportDto.class));
-        }
-        return reportDtos;
-    }
-    public List<ReportDto> getReportsForCommentsComment(int commentsCommentId) {
+    return reportPageDto;
+}
+    public ReportPageDto getReportsForCommentsComment(int commentsCommentId, int page, int pageSize) {
         Optional<CommentsComment> commentsComment = commentsCommentRepository.findById(commentsCommentId);
-        List<Report> reportEntities = reportBoardRepository.findByCommentsComment(commentsComment.get());
-        List<ReportDto> reportDtos = new ArrayList<>();
-        for(Report report : reportEntities){
-            reportDtos.add(modelMapper.map(report, ReportDto.class));
-        }
-        return reportDtos;
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("regTime").descending());
+        Page<Report> reportPage = reportBoardRepository.findByCommentsCommentAndReportStatusOrderByRegTimeDesc(commentsComment.get(), false, pageable);
+        List<ReportDto> reportDtoList = reportPage.map(report -> modelMapper.map(report, ReportDto.class)).getContent();
+
+        ReportPageDto reportPageDto = new ReportPageDto();
+        reportPageDto.setReportList(reportDtoList);
+        reportPageDto.setCurrentPage(reportPage.getNumber() + 1);
+        reportPageDto.setTotalPages(reportPage.getTotalPages());
+
+        return reportPageDto;
     }
-
-
     @Transactional
     public void confirmReports(List<Integer> reportIds) {
         List<Report> reports = reportBoardRepository.findAllById(reportIds);
@@ -192,6 +198,5 @@ public class ReportService {
         reportBoardRepository.saveAll(reports);
     }
 
-    // 신고 미처리 수
 
 }

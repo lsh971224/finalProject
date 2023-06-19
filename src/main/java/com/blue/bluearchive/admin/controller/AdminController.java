@@ -6,12 +6,18 @@ import com.blue.bluearchive.admin.service.AdminBoardService;
 import com.blue.bluearchive.admin.service.CategoryService;
 import com.blue.bluearchive.board.dto.CommentDto;
 import com.blue.bluearchive.board.dto.CommentsCommentDto;
+import com.blue.bluearchive.board.entity.CommentsComment;
 import com.blue.bluearchive.board.service.BoardService;
 import com.blue.bluearchive.board.service.CommentService;
 import com.blue.bluearchive.board.service.CommentsCommentService;
+import com.blue.bluearchive.report.entity.Report;
 import com.blue.bluearchive.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -231,30 +237,32 @@ public class AdminController {
     }
 
 //    게시글 신고 클릭시 팝업
-    @GetMapping("/reportList/{boardId}")
-    public String boardReportResult(@PathVariable int boardId, Model model){
-        List<ReportDto> reports = reportService.getReportsForBoard(boardId); //보드에대한 신고
+    @GetMapping("/boardReport/{boardId}")
+    public String boardReportResult(@PathVariable int boardId,@RequestParam(defaultValue = "1") int page, Model model){
+        int pageSize = 5; // 한 페이지에 보여줄 게시글 수
+        ReportPageDto reportPageDto = reportService.getReportsForBoard(boardId, page, pageSize);
+        model.addAttribute("reportPageDto", reportPageDto);
         model.addAttribute("boardId", boardId);
-        model.addAttribute("reports", reports);
 
         return "adminPage/boardReportResult";
     }
 
     //댓글 신고 클릭시 팝업
     @GetMapping("/commentReport/{commentId}")
-    public String commentReportResult(@PathVariable int commentId, Model model){
-        List<ReportDto> reports = reportService.getReportsForComment(commentId); //보드에대한 신고
+    public String commentReportResult(@PathVariable int commentId, @RequestParam(defaultValue = "1") int page, Model model){
+        int pageSize = 5; // 한 페이지에 보여줄 게시글 수
+        ReportPageDto reportPageDto = reportService.getReportsForComment(commentId, page, pageSize);
         model.addAttribute("commentId", commentId);
-        model.addAttribute("reports", reports);
+        model.addAttribute("reportPageDto", reportPageDto);
 
         return "adminPage/commentReportResult";
     }
-    //대댓글 신고 클릭시 팝업
     @GetMapping("/commentsComment/{commentsCommentId}")
-    public String commentsCommentReportResult(@PathVariable int commentsCommentId, Model model){
-        List<ReportDto> reports = reportService.getReportsForCommentsComment(commentsCommentId); //보드에대한 신고
+    public String commentsCommentReportResult(@PathVariable int commentsCommentId, @RequestParam(defaultValue = "1") int page, Model model) {
+        int pageSize = 5; // 한 페이지에 보여줄 게시글 수
+        ReportPageDto reportPageDto = reportService.getReportsForCommentsComment(commentsCommentId, page, pageSize);
         model.addAttribute("commentsCommentId", commentsCommentId);
-        model.addAttribute("reports", reports);
+        model.addAttribute("reportPageDto", reportPageDto);
 
         return "adminPage/commentsCommentReportResult";
     }

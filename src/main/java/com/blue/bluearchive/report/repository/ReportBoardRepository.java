@@ -24,4 +24,9 @@ public interface ReportBoardRepository extends JpaRepository<Report,Integer> {
     List<Report> findByCommentCommentIdAndReportStatusFalse(int commentId);
 
     List<Report> findByCommentsCommentCommentsCommentIdAndReportStatusFalse(int commentsId);
+
+
+    Page<Report> findByCommentsCommentAndReportStatusOrderByRegTimeDesc(CommentsComment commentsComment, boolean b, Pageable pageable);
+    Page<Report> findByCommentAndReportStatusOrderByRegTimeDesc(Comment comment, boolean b, Pageable pageable);
+    Page<Report> findByBoardAndReportStatusOrderByRegTimeDesc(Board board, boolean b, Pageable pageable);
 }

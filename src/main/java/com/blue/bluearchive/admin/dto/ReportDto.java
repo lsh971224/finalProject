@@ -1,6 +1,8 @@
 package com.blue.bluearchive.admin.dto;
 
 import com.blue.bluearchive.board.entity.Board;
+import com.blue.bluearchive.board.entity.Comment;
+import com.blue.bluearchive.board.entity.CommentsComment;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,4 +16,6 @@ public class ReportDto {
     private String reportContent;
     private Board board;
     private boolean reportStatus;
+    private Comment comment;
+    private CommentsComment commentsComment;
 }

@@ -10,7 +10,7 @@
         $(document).ready(function (){
             $('.openReportList').click(function(){
                 const id = $(this).val();
-                const url = '/admin/reportList/' + id
+                const url = '/admin/boardReport/' + id
                 window.open(url, '신고 목록', 'width=500,height=400,left=150,top=50');
             });
             $('#categoryId').change(function(){
